@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Slumzick Search</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <img src="wasd-removebg-preview.png" class="logo" alt="Slumzick Logo">
+  <h1>SLUMZICK SMITH SHOP</h1>
+
+  <select id="searchType">
+    <option value="phone">ค้นหาด้วยเบอร์โทรศัพท์</option>
+    <option value="id">ค้นหาด้วยเลขบัตรประชาชน</option>
+  </select>
+
+  <input id="searchInput" placeholder="กรอกข้อมูลที่ต้องการค้นหา">
+  <button onclick="search()">ค้นหา</button>
+  <div id="msg"></div>
+  <div id="result"></div>
+</div>
+
+<script>
+// เช็กล็อกอิน
+if(localStorage.getItem("slumzick_login")!=="1"){
+  window.location.href="login.html";
+}
+
+function search(){
+  const query = document.getElementById("searchInput").value.trim();
+  const type = document.getElementById("searchType").value;
+  const token = localStorage.getItem("userToken");
+  const msg = document.getElementById("msg");
+  const result = document.getElementById("result");
+
+  msg.innerText = "";
+  result.innerText = "";
+
+  if(!query){
+    msg.innerText = "กรุณากรอกข้อมูล";
+    return;
+  }
+
+  // กำหนด URL API ตาม type
+  let apiUrl = "";
+  if(type==="phone"){
+    apiUrl = `https://slumzick.xyz/?type=phone&value=${encodeURIComponent(query)}&token=${encodeURIComponent(token)}`;
+  } else if(type==="id"){
+    apiUrl = `https://slumzick.xyz/?type=id&value=${encodeURIComponent(query)}&token=${encodeURIComponent(token)}`;
+  }
+
+  // เรียก API
+  fetch(apiUrl)
+    .then(res=>res.json())
+    .then(data=>{
+      // แสดงผล
+      result.innerText = JSON.stringify(data, null, 2);
+    })
+    .catch(err=>{
+      console.error(err);
+      msg.innerText = "API อาจจะบัคนะครับรอสักครู่";
+    });
+}
+</script>
+
+</body>
+</html>

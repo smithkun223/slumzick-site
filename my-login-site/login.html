@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Slumzick Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <img src="wasd-removebg-preview.png" class="logo" alt="Slumzick Logo">
+  <h1>SLUMZICK SHOP</h1>
+  <input id="tokenInput" placeholder="กรอกโทเค่น">
+  <button onclick="login()">Login</button>
+  <div id="msg"></div>
+</div>
+
+<script>
+function login(){
+  const token = document.getElementById("tokenInput").value.trim();
+  if(!token){
+    document.getElementById("msg").innerText="กรุณากรอกโทเค่น";
+    return;
+  }
+
+  // ดึงโทเค่นจาก localStorage ของ Slumzick
+  const tokens = JSON.parse(localStorage.getItem("slumzick_tokens")||"[]");
+  const now = new Date().toISOString().slice(0,10);
+
+  const t = tokens.find(x=>x.token===token);
+  if(!t){
+    document.getElementById("msg").innerText="❌ โทเค่นไม่ถูกต้อง";
+    return;
+  }
+  if(now > t.expire){
+    document.getElementById("msg").innerText="❌ โทเค่นหมดอายุแล้ว";
+    return;
+  }
+
+  // บันทึก token + login
+  localStorage.setItem("slumzick_login","1");
+  localStorage.setItem("userToken", token);
+
+  // บันทึกประวัติ
+  let logs = JSON.parse(localStorage.getItem("slumzick_logs")||"[]");
+  logs.push("ใช้โทเค่น: "+token+" | "+new Date().toLocaleString());
+  localStorage.setItem("slumzick_logs", JSON.stringify(logs));
+
+  // เด้งไปหน้า search.html
+  window.location.href="search.html";
+}
+</script>
+
+</body>
+</html>
